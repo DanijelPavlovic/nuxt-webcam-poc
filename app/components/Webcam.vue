@@ -17,7 +17,7 @@ const {
 </script>
 
 <template>
-  <div class="flex flex-col items-center p-4 space-y-4 w-full">
+  <div class="flex flex-col items-center p-4 space-y-4 w-full h-screen">
 
     <video
         v-show="isWebcamActive" ref="videoRef" autoplay
@@ -53,7 +53,7 @@ const {
           @click="toggleCamera"/>
     </div>
 
-    <div class="w-full h-80 overflow-y-auto mt-4">
+    <div class="w-full flex-1 overflow-y-auto mt-4 max-h-[calc(100vh-300px)]">
       <div class="flex justify-center pb-4">
         <UButton
             v-if="snapshots.length"
@@ -69,7 +69,7 @@ const {
         <div v-for="(img, index) in snapshots" :key="index" class="relative">
           <img
               :src="img"
-              class="w-full h-32 object-cover border rounded-lg shadow-md"
+              class="w-full object-cover border rounded-lg shadow-md"
               alt="snapshot"
           >
           <div class="absolute bottom-2 right-2 flex gap-2">
