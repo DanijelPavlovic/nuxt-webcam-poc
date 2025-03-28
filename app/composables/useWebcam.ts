@@ -1,6 +1,6 @@
-import { ref, onBeforeUnmount } from "vue";
+import {ref, onBeforeUnmount} from "vue";
 import JSZip from "jszip";
-import { saveAs } from "file-saver";
+import * as FileSaver from "file-saver";
 
 export const useWebcam = () => {
     const videoRef = ref<HTMLVideoElement | null>(null);
@@ -14,7 +14,7 @@ export const useWebcam = () => {
     const startWebcam = async (): Promise<void> => {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({
-                video: { width: videoWidth, height: videoHeight },
+                video: {width: videoWidth, height: videoHeight},
             });
 
             if (videoRef.value) {
@@ -63,11 +63,11 @@ export const useWebcam = () => {
 
         snapshots.value.forEach((img, index) => {
             const imgData = img.split(",")[1];
-            zip.file(`snapshot${index + 1}.png`, imgData, { base64: true });
+            zip.file(`snapshot${index + 1}.png`, imgData, {base64: true});
         });
 
-        zip.generateAsync({ type: "blob" }).then((content) => {
-            saveAs(content, "snapshots.zip");
+        zip.generateAsync({type: "blob"}).then((content) => {
+            FileSaver.saveAs(content, "snapshots.zip");
         });
     };
 
