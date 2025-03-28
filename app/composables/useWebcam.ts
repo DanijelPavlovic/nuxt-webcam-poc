@@ -47,19 +47,22 @@ export const useWebcam = () => {
         }
     };
 
-    const stopWebcam = (): void => {
+    const stopWebcam = (shouldClearSnapshots: boolean = true): void => {
         const stream = videoRef.value?.srcObject as MediaStream;
         if (stream) {
             const tracks = stream.getTracks();
             tracks.forEach((track) => track.stop());
         }
         isWebcamActive.value = false;
-        clearSnapshots();
+
+        if (shouldClearSnapshots) {
+            clearSnapshots();
+        }
     };
 
 
     const toggleCamera = async (): Promise<void> => {
-        stopWebcam();
+        stopWebcam(false);
         currentCamera.value = currentCamera.value === CameraFacingMode.USER ? CameraFacingMode.ENVIRONMENT : CameraFacingMode.USER;
         await startWebcam(currentCamera.value);
     };

@@ -38,13 +38,13 @@ const {
           icon="i-lucide-camera"
           color="secondary"
           class="justify-center sm:w-auto"
-          @click="startWebcam"/>
+          @click="() => startWebcam()"/>
       <UButton
           v-if="isWebcamActive"
           icon="i-lucide-camera-off"
           color="error"
           class="justify-center sm:w-auto"
-          @click="stopWebcam"/>
+          @click="() => stopWebcam()"/>
       <UButton
           v-if="isWebcamActive && isMobile"
           icon="i-lucide-switch-camera"
