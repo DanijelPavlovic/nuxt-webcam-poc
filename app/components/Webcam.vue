@@ -31,12 +31,12 @@ const stopWebcam = (): void => {
     tracks.forEach(track => track.stop());
   }
   isWebcamActive.value = false;
-  clearSnapshots()
+  clearSnapshots();
 };
 
 const clearSnapshots = (): void => {
   snapshots.value = [];
-}
+};
 
 const takeSnapshot = (): void => {
   if (!videoRef.value || !canvasRef.value) return;
@@ -67,24 +67,30 @@ onBeforeUnmount(stopWebcam);
 <template>
   <div class="flex flex-col items-center p-4 space-y-4">
 
-    <video v-show="isWebcamActive" ref="videoRef" autoplay
-           class="border rounded-lg shadow-lg w-full max-w-[640px] h-auto object-cover"/>
-    <div v-if="!isWebcamActive" class="grid gap-2">
-      <USkeleton class="w-[640px] h-[480px]"/>
+    <video
+        v-show="isWebcamActive" ref="videoRef" autoplay
+        class="border rounded-lg shadow-lg w-full max-w-[640px] h-auto object-cover"/>
+
+    <div v-if="!isWebcamActive" class="w-full sm:w-[640px] sm:h-[480px] h-[240px]">
+      <USkeleton class="w-full h-full"/>
     </div>
 
-    <canvas ref="canvasRef" width="640" height="480" class="hidden"></canvas>
+    <canvas ref="canvasRef" width="640" height="480" class="hidden"/>
 
-    <div class="flex gap-4">
-      <UButton v-if="isWebcamActive" @click="takeSnapshot">Take Snapshot</UButton>
-      <UButton v-if="!isWebcamActive" color="secondary" @click="startWebcam">Start Webcam</UButton>
-      <UButton v-if="isWebcamActive" color="error" @click="stopWebcam">Stop Webcam</UButton>
+    <div class="flex gap-4 flex-wrap justify-center">
+      <UButton v-if="isWebcamActive" @click="takeSnapshot" class="justify-center sm:w-auto">Take Snapshot</UButton>
+      <UButton v-if="!isWebcamActive" color="secondary" @click="startWebcam" class="justify-center sm:w-auto">Start
+        Webcam
+      </UButton>
+      <UButton v-if="isWebcamActive" color="error" @click="stopWebcam" class="justify-center sm:w-auto">Stop Webcam
+      </UButton>
     </div>
 
     <div class="w-full h-80 overflow-y-auto mt-4">
-
       <div class="flex justify-center pb-4">
-        <UButton v-if="snapshots.length" color="warning" @click="downloadAllSnapshots">Download snapshots</UButton>
+        <UButton v-if="snapshots.length" color="warning" class="justify-center" @click="downloadAllSnapshots">Download
+          snapshots
+        </UButton>
       </div>
 
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
