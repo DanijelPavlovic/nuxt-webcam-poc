@@ -1,77 +1,25 @@
 <script lang="ts" setup>
-import {ref, onBeforeUnmount} from 'vue';
-import JSZip from 'jszip';
-import {saveAs} from 'file-saver';
+import {useWebcam} from "~/composables/useWebcam";
 
-const videoRef = ref<HTMLVideoElement | null>(null);
-const canvasRef = ref<HTMLCanvasElement | null>(null);
-const snapshots = ref<string[]>([]);
-const isWebcamActive = ref<boolean>(false);
-
-const videoWidth = 1920;
-const videoHeight = 1080;
-
-const startWebcam = async (): Promise<void> => {
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({video: {width: videoWidth, height: videoHeight}});
-    if (videoRef.value) {
-      videoRef.value.srcObject = stream;
-      isWebcamActive.value = true;
-    }
-  } catch (error) {
-    console.error('Error accessing webcam:', error);
-    isWebcamActive.value = false;
-  }
-};
-
-const stopWebcam = (): void => {
-  const stream = videoRef.value?.srcObject as MediaStream;
-  if (stream) {
-    const tracks = stream.getTracks();
-    tracks.forEach(track => track.stop());
-  }
-  isWebcamActive.value = false;
-  clearSnapshots();
-};
-
-const clearSnapshots = (): void => {
-  snapshots.value = [];
-};
-
-const takeSnapshot = (): void => {
-  if (!videoRef.value || !canvasRef.value) return;
-
-  const context = canvasRef.value.getContext('2d');
-  if (context) {
-    context.drawImage(videoRef.value, 0, 0, canvasRef.value.width, canvasRef.value.height);
-    snapshots.value.push(canvasRef.value.toDataURL('image/png'));
-  }
-};
-
-const downloadAllSnapshots = async (): Promise<void> => {
-  const zip = new JSZip();
-
-  snapshots.value.forEach((img, index) => {
-    const imgData = img.split(',')[1];
-    zip.file(`snapshot${index + 1}.png`, imgData, {base64: true});
-  });
-
-  zip.generateAsync({type: 'blob'}).then(content => {
-    saveAs(content, 'snapshots.zip');
-  });
-};
-
-const removeSnapshot = (index: number): void => {
-  snapshots.value.splice(index, 1);
-};
-
-onBeforeUnmount(stopWebcam);
+const {
+  videoRef,
+  canvasRef,
+  startWebcam,
+  stopWebcam,
+  takeSnapshot,
+  removeSnapshot,
+  downloadAllSnapshots,
+  isWebcamActive,
+  snapshots,
+} = useWebcam();
 </script>
 
 <template>
   <div class="flex flex-col items-center p-4 space-y-4 w-full">
 
-    <video v-show="isWebcamActive" ref="videoRef" autoplay class="border rounded-lg shadow-lg w-full max-w-[640px] h-auto object-cover"/>
+    <video
+        v-show="isWebcamActive" ref="videoRef" autoplay
+        class="border rounded-lg shadow-lg w-full max-w-[640px] h-auto object-cover"/>
 
     <div v-if="!isWebcamActive" class="w-full h-[244px] sm:w-[640px] sm:h-[360px]">
       <USkeleton class="w-full h-full"/>
@@ -80,19 +28,36 @@ onBeforeUnmount(stopWebcam);
     <canvas ref="canvasRef" width="640" height="480" class="hidden"/>
 
     <div class="flex gap-4 flex-wrap justify-center">
-      <UButton v-if="isWebcamActive" icon="i-lucide-camera" class="justify-center sm:w-auto" @click="takeSnapshot">Take Snapshot</UButton>
-      <UButton v-if="!isWebcamActive" icon="i-lucide-camera" color="secondary" class="justify-center sm:w-auto" @click="startWebcam" />
-      <UButton v-if="isWebcamActive" icon="i-lucide-camera-off" color="error" class="justify-center sm:w-auto" @click="stopWebcam" />
+      <UButton v-if="isWebcamActive" icon="i-lucide-camera" class="justify-center sm:w-auto" @click="takeSnapshot">Take
+        Snapshot
+      </UButton>
+      <UButton
+          v-if="!isWebcamActive"
+          icon="i-lucide-camera"
+          color="secondary"
+          class="justify-center sm:w-auto"
+          @click="startWebcam"/>
+      <UButton
+          v-if="isWebcamActive"
+          icon="i-lucide-camera-off"
+          color="error"
+          class="justify-center sm:w-auto"
+          @click="stopWebcam"/>
     </div>
 
     <div class="w-full h-80 overflow-y-auto mt-4">
       <div class="flex justify-center pb-4">
-        <UButton v-if="snapshots.length" icon="i-lucide-download" color="warning" class="justify-center" @click="downloadAllSnapshots">Download
+        <UButton
+            v-if="snapshots.length"
+            icon="i-lucide-download"
+            color="warning"
+            class="justify-center"
+            @click="downloadAllSnapshots">Download
           All
         </UButton>
       </div>
 
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 px-1 sm:px-24">
         <div v-for="(img, index) in snapshots" :key="index" class="relative">
           <img
               :src="img"
@@ -101,9 +66,20 @@ onBeforeUnmount(stopWebcam);
           >
           <div class="absolute bottom-2 right-2 flex gap-2">
             <a :href="img" download="snapshot.png">
-              <UButton icon="i-lucide-download" size="xs" variant="subtle" color="primary" class="p-2"/>
+              <UButton
+                  icon="i-lucide-download"
+                  size="xs"
+                  variant="subtle"
+                  color="primary"
+                  class="p-2"/>
             </a>
-            <UButton icon="i-lucide-trash" size="xs" variant="subtle" color="error" class="p-2" @click="removeSnapshot(index)"/>
+            <UButton
+                icon="i-lucide-trash"
+                size="xs"
+                variant="subtle"
+                color="error"
+                class="p-2"
+                @click="removeSnapshot(index)"/>
           </div>
         </div>
       </div>
