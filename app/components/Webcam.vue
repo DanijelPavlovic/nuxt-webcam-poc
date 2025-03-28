@@ -95,7 +95,7 @@ onBeforeUnmount(stopWebcam);
               alt="snapshot"
           >
           <a :href="img" download="snapshot.png" class="absolute bottom-2 right-2">
-            <UButton icon="i-lucide-download" variant="subtle" color="primary" class="p-2"/>
+            <UButton icon="i-lucide-download" size="xs" variant="subtle" color="primary" class="p-2"/>
           </a>
         </div>
       </div>
