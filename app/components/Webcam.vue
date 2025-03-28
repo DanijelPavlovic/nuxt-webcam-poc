@@ -9,10 +9,11 @@ const {
   toggleCamera,
   takeSnapshot,
   removeSnapshot,
+  removeAllSnapshots,
   downloadAllSnapshots,
   isWebcamActive,
   isMobile,
-  snapshots,
+  snapshotList,
 } = useWebcam();
 </script>
 
@@ -54,26 +55,34 @@ const {
     </div>
 
     <div class="w-full flex-1 overflow-y-auto mt-4 max-h-[calc(100vh-300px)]">
-      <div class="flex justify-center pb-4">
+      <div class="flex justify-center pb-4 gap-4">
         <UButton
-            v-if="snapshots.length"
+            v-if="snapshotList.length"
             icon="i-lucide-download"
             color="warning"
             class="justify-center"
-            @click="downloadAllSnapshots">Download
-          All
+            @click="downloadAllSnapshots">
+          Download All
+        </UButton>
+        <UButton
+            v-if="snapshotList.length"
+            icon="i-lucide-trash"
+            color="error"
+            class="justify-center"
+            @click="removeAllSnapshots">
+          Delete All
         </UButton>
       </div>
 
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 px-1 sm:px-24">
-        <div v-for="(img, index) in snapshots" :key="index" class="relative">
+        <div v-for="(snapshot, index) in snapshotList" :key="index" class="relative">
           <img
-              :src="img"
+              :src="snapshot"
               class="w-full object-cover border rounded-lg shadow-md"
               alt="snapshot"
           >
           <div class="absolute bottom-2 right-2 flex gap-2">
-            <a :href="img" download="snapshot.png">
+            <a :href="snapshot" download="snapshot.png">
               <UButton
                   icon="i-lucide-download"
                   size="xs"

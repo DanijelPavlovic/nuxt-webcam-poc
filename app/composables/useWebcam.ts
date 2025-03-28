@@ -18,6 +18,8 @@ export const useWebcam = () => {
     const videoWidth = 1920;
     const videoHeight = 1080;
 
+    const snapshotList = computed(() => snapshots.value)
+
     const detectMobile = (): boolean => {
         return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
     };
@@ -104,12 +106,16 @@ export const useWebcam = () => {
         snapshots.value.splice(index, 1);
     };
 
+    const removeAllSnapshots = (): void => {
+        snapshots.value = [];
+    }
+
     onBeforeUnmount(stopWebcam);
 
     return {
         videoRef,
         canvasRef,
-        snapshots,
+        snapshotList,
         isWebcamActive,
         isMobile,
         startWebcam,
@@ -117,6 +123,7 @@ export const useWebcam = () => {
         toggleCamera,
         takeSnapshot,
         removeSnapshot,
+        removeAllSnapshots,
         downloadAllSnapshots,
     };
 };
