@@ -6,10 +6,12 @@ const {
   canvasRef,
   startWebcam,
   stopWebcam,
+  toggleCamera,
   takeSnapshot,
   removeSnapshot,
   downloadAllSnapshots,
   isWebcamActive,
+  isMobile,
   snapshots,
 } = useWebcam();
 </script>
@@ -43,6 +45,12 @@ const {
           color="error"
           class="justify-center sm:w-auto"
           @click="stopWebcam"/>
+      <UButton
+          v-if="isWebcamActive && isMobile"
+          icon="i-lucide-switch-camera"
+          color="primary"
+          class="justify-center sm:w-auto"
+          @click="toggleCamera"/>
     </div>
 
     <div class="w-full h-80 overflow-y-auto mt-4">

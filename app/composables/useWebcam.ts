@@ -2,24 +2,43 @@ import {ref, onBeforeUnmount} from "vue";
 import JSZip from "jszip";
 import * as FileSaver from "file-saver";
 
+enum CameraFacingMode {
+    USER = "user",
+    ENVIRONMENT = "environment",
+}
+
 export const useWebcam = () => {
     const videoRef = ref<HTMLVideoElement | null>(null);
     const canvasRef = ref<HTMLCanvasElement | null>(null);
     const snapshots = ref<string[]>([]);
     const isWebcamActive = ref<boolean>(false);
+    const currentCamera = ref<CameraFacingMode>(CameraFacingMode.USER);
 
+    const isMobile = ref<boolean>(false);
     const videoWidth = 1920;
     const videoHeight = 1080;
 
-    const startWebcam = async (): Promise<void> => {
+    const detectMobile = (): boolean => {
+        return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
+    };
+
+    onMounted(() => {
+        isMobile.value = detectMobile();
+    });
+
+    const startWebcam = async (facingMode: CameraFacingMode = CameraFacingMode.USER): Promise<void> => {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({
-                video: {width: videoWidth, height: videoHeight},
+                video: {
+                    width: videoWidth,
+                    height: videoHeight,
+                    facingMode,
+                },
             });
 
             if (videoRef.value) {
                 videoRef.value.srcObject = stream;
-                videoRef.value.play(); // Ensure video starts playing
+                videoRef.value.play();
                 isWebcamActive.value = true;
             }
         } catch (error) {
@@ -36,6 +55,13 @@ export const useWebcam = () => {
         }
         isWebcamActive.value = false;
         clearSnapshots();
+    };
+
+
+    const toggleCamera = async (): Promise<void> => {
+        stopWebcam();
+        currentCamera.value = currentCamera.value === CameraFacingMode.USER ? CameraFacingMode.ENVIRONMENT : CameraFacingMode.USER;
+        await startWebcam(currentCamera.value);
     };
 
     const clearSnapshots = (): void => {
@@ -82,8 +108,10 @@ export const useWebcam = () => {
         canvasRef,
         snapshots,
         isWebcamActive,
+        isMobile,
         startWebcam,
         stopWebcam,
+        toggleCamera,
         takeSnapshot,
         removeSnapshot,
         downloadAllSnapshots,
